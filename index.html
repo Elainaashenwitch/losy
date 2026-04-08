@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lost by Unicorns</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:Inter; }
+
+:root {
+  --bg:#181818;
+  --card:#222;
+  --text:#eee;
+  --sub:#aaa;
+  --accent:#00d4ff;
+  --border:#333;
+}
+
+body.light {
+  --bg:#f5f5f5;
+  --card:#fff;
+  --text:#222;
+  --sub:#555;
+  --border:#ccc;
+}
+
+body.rainbow {
+  background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
+  background-size: 1400% 1400%;
+  animation: rainbow 10s ease infinite;
+}
+@keyframes rainbow {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+body {
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* HEADER */
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 30px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+}
+
+nav a {
+  margin:0 10px;
+  cursor:pointer;
+  color:var(--sub);
+}
+nav a:hover { color:var(--accent); }
+
+.header-search {
+  width:40%;
+  padding:10px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* BUTTON */
+.btn {
+  padding:8px 14px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  cursor:pointer;
+}
+.btn:hover {
+  background:var(--accent);
+  color:black;
+}
+
+/* LAYOUT */
+.main {
+  display:flex;
+  gap:20px;
+  padding:20px;
+  flex:1;
+}
+
+/* LEFT PANEL */
+.left {
+  width:30%;
+  min-height: calc(100vh - 120px);
+  flex-shrink:0;
+}
+
+/* REPORT ITEM CARD (big single box) */
+.report-card {
+  background:var(--card);
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 0 10px rgba(0,0,0,0.3);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  height: auto;
+  margin-top: 30px;
+}
+
+/* RIGHT PANEL */
+.right {
+  width:70%;
+}
+
+/* GRID */
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:20px;
+}
+
+/* CARD */
+.card {
+  background:var(--card);
+  padding:15px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  cursor:grab;
+}
+.card img {
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+/* INPUT */
+input, textarea {
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* LOGIN */
+.login {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.login-box {
+  background:var(--card);
+  padding:30px;
+  border-radius:12px;
+  width:300px;
+}
+
+/* TOAST */
+.toast {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--accent);
+  color:black;
+  padding:12px;
+  border-radius:8px;
+  opacity:0;
+  transition:0.3s;
+}
+.toast.show { opacity:1; }
+
+/* FOOTER */
+footer {
+  text-align:center;
+  padding:15px;
+  border-top:1px solid var(--border);
+  font-size:14px;
+  color:var(--sub);
+  background:var(--card);
+  position:sticky;
+  bottom:0;
+}
+
+/* SETTINGS BOX */
+.settings-box {
+  background:var(--card);
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
+
+/* IMAGE MODAL */
+#imgModal {
+  display:none;
+  position:fixed;
+  z-index:999;
+  left:0; top:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+}
+#imgModal img {
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+}
+#imgModal span {
+  position:absolute;
+  top:20px;
+  right:30px;
+  font-size:40px;
+  cursor:pointer;
+  color:white;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login">
+  <div class="login-box">
+    <h2>Login</h2>
+    <input id="user" placeholder="Username">
+    <input id="pass" type="password" placeholder="Password">
+    <button class="btn" onclick="login()">Login</button>
+    <button class="btn" onclick="register()">Register</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+<header>
+  <h3>🦄 Lost by Unicorns</h3>
+  <input id="search" class="header-search" placeholder="Search...">
+  <nav>
+    <a onclick="show('home')">🏠</a>
+    <a onclick="show('settings')">⚙️</a>
+    <a onclick="logout()">🚪</a>
+  </nav>
+  <button class="btn" onclick="toggleTheme()">🌗</button>
+</header>
+
+<!-- HOME -->
+<div id="home" class="main">
+  <div class="left">
+    <div class="report-card">
+      <h3>📌 Report Item</h3>
+      <input id="name" placeholder="Item name">
+      <textarea id="desc" placeholder="Description"></textarea>
+      <input type="file" id="img">
+      <button class="btn" onclick="add()">Upload</button>
+    </div>
+  </div>
+
+  <div class="right">
+    <h3>📦 Missing Items</h3>
+    <div id="items" class="grid"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings" style="display:none; padding:20px;">
+  <div class="settings-box">
+    <h2>⚙️ Settings</h2>
+    <h3>👤 Account Information</h3>
+    <p><b>Username:</b> <span id="currentUser"></span></p>
+    <p><b>Account ID:</b> <span id="accountID"></span></p>
+
+    <h3 style="margin-top:20px;">📞 Contact Information</h3>
+    <p>📍 Address: Wawa, Rizal, Philippines</p>
+    <p>📱 Phone: +63 912 345 6789</p>
+    <p>📧 Email: support@unicorns.com</p>
+
+    <h3 style="margin-top:20px;">🌐 Social Media</h3>
+    <p>🔵 Facebook | 📸 Instagram | 🐦 Twitter</p>
+
+    <h3 style="margin-top:20px;">📜 Legal</h3>
+    <p>Privacy Policy | Terms & Conditions | Cookie Consent</p>
+
+    <h3 style="margin-top:20px;">🗺️ Sitemap</h3>
+    <p>Home | Settings | Account</p>
+  </div>
+</div>
+</div>
+
+<!-- IMAGE MODAL -->
+<div id="imgModal">
+  <span onclick="closeModal()">&times;</span>
+  <img id="modalImg" src="">
+</div>
+
+<div id="toast" class="toast"></div>
+
+<footer>
+  by Edrian Sacramento BSCS 2 Blk-A | unicorns and rainbows 🦄🌈
+</footer>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let current = localStorage.getItem("user");
+let items = JSON.parse(localStorage.getItem("items")) || [];
+
+function save(){ localStorage.setItem("items",JSON.stringify(items)); }
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.innerText=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2000);
+}
+
+/* LOGIN */
+function login(){
+  const u=user.value, p=pass.value;
+  const found=users.find(x=>x.u===u && x.p===p);
+  if(found){ localStorage.setItem("user",u); location.reload(); }
+  else toast("Invalid login");
+}
+function register(){
+  const u=user.value, p=pass.value;
+  if(!u||!p){toast("Fill all fields");return;}
+  if(users.find(x=>x.u===u)){toast("User exists");return;}
+  const id="UID-"+Math.floor(Math.random()*1000000);
+  users.push({u,p,id});
+  localStorage.setItem("users",JSON.stringify(users));
+  toast("Registered!");
+}
+function logout(){ localStorage.removeItem("user"); location.reload(); }
+
+/* INIT */
+if(current){
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("app").style.display="block";
+  const userData = users.find(x=>x.u===current);
+  currentUser.innerText=current;
+  accountID.innerText=userData?.id || "N/A";
+}
+
+/* THEME */
+function toggleTheme(){ document.body.classList.toggle("light"); }
+
+/* RAINBOW */
+document.addEventListener("keydown",e=>{
+  if(e.key.toLowerCase()==="u"){ document.body.classList.toggle("rainbow"); toast("🌈 Rainbow mode!"); }
+});
+
+/* ADD ITEM */
+function add(){
+  const f=img.files[0];
+  if(!name.value||!desc.value||!f){toast("Fill all fields");return;}
+  const r=new FileReader();
+  r.onload=function(){
+    items.unshift({name:name.value,desc:desc.value,img:r.result});
+    save(); render();
+    name.value=""; desc.value=""; img.value="";
+  }
+  r.readAsDataURL(f);
+}
+
+/* RENDER */
+function render(){
+  const box=document.getElementById("items");
+  const q=document.getElementById("search").value.toLowerCase();
+  box.innerHTML="";
+
+  items.forEach((i,idx)=>{
+    if(!i.name.toLowerCase().includes(q)) return;
+    const c=document.createElement("div");
+    c.className="card"; c.draggable=true;
+    c.innerHTML=`
+      <img src="${i.img}" onclick="openModal('${i.img}')">
+      <h4>${i.name}</h4>
+      <p>${i.desc}</p>
+      <button class="btn" onclick="del(${idx})">Delete</button>
+    `;
+    c.addEventListener("dragstart",(e)=>{ e.dataTransfer.setData("text/plain", idx); });
+    c.addEventListener("dragover",(e)=>e.preventDefault());
+    c.addEventListener("drop",(e)=>{
+      e.preventDefault();
+      const from=+e.dataTransfer.getData("text/plain");
+      items.splice(idx,0,items.splice(from,1)[0]);
+      save(); render();
+    });
+    box.appendChild(c);
+  });
+}
+
+/* DELETE */
+function del(i){ items.splice(i,1); save(); render(); }
+
+/* NAVIGATION */
+function show(id){
+  document.getElementById("home").style.display="none";
+  document.getElementById("settings").style.display="none";
+  
+  // If showing home, use 'flex' to preserve the layout. Otherwise, use 'block'.
+  if (id === 'home') {
+    document.getElementById(id).style.display = "flex";
+  } else {
+    document.getElementById(id).style.display = "block";
+  }
+}
+document.getElementById("search").addEventListener("input",render);
+
+/* IMAGE MODAL */
+function openModal(src){
+  document.getElementById("modalImg").src=src;
+  document.getElementById("imgModal").style.display="flex";
+}
+function closeModal(){ document.getElementById("imgModal").style.display="none"; }
+
+render();
+</script>
+</body>
+</html>
